@@ -35,7 +35,14 @@ const PrefRequestSchema = z.object({
     notes: z.string().optional()
 })
 
-type PrefRequestType = z.infer<typeof PrefRequestSchema>
+router.get('/', async (req: Request, res: Response) =>{
+    // const user = await User.findOne({sub: res.locals.sub})
+    // if (!user) return res.sendStatus(401)
+    const [user] = await User.find<UserType>()
+    const allPrefs = await Pref.find<PrefType>({userSub: user.sub});
+    res.send(allPrefs)
+})
+
 
 router.post('/', verifyReqSchema(PrefRequestSchema), async (req: Request, res: Response) =>{
     const request: PrefType = req.body
@@ -45,12 +52,23 @@ router.post('/', verifyReqSchema(PrefRequestSchema), async (req: Request, res: R
     
     const [user] = await User.find<UserType>()
     
-    // const prevPrefs = await Pref.find({userSub: user.sub})
-
-    // ide kell logika, kiszurni h ne utkozzenek az uj pref temp-jei a meglevokkel
+    const prevPrefs = await Pref.find<PrefType>({
+        $and: [
+            {userSub: user.sub},
+            {$or: [
+                {$and:[
+                    {maxTemp: {$lte: request.maxTemp}},
+                    {maxTemp: {$gte: request.minTemp}}]},
+                {$and:[
+                    {minTemp: {$gte: request.minTemp}},
+                    {minTemp: {$lte: request.maxTemp}}]},
+            ]}]
+        });
     
-    const newPref = await Pref.create<PrefType>(request)
-    const allPrefs = await Pref.find({userSub: user.sub})
+    if (prevPrefs.length) return res.status(400).json("One or more records exist for this temperature interval")
+    
+    await Pref.create<PrefType>(request);
+    const allPrefs = await Pref.find<PrefType>({userSub: user.sub})
     res.send(allPrefs)
 })
 
@@ -61,12 +79,17 @@ router.put('/:id', verifyReqSchema(PrefRequestSchema), async (req: Request, res:
     // if (!user) return res.sendStatus(401)
 
     // const prevPrefs = await Pref.find({userSub: user.sub})
+    const [user] = await User.find<UserType>()
+    const prevPrefs = await Pref.find<PrefType>({userSub: user.sub});
 
-    // ide kell logika, kiszurni h ne utkozzenek a frissitett pref temp-jei a meglevokkel
+    
+    const existingTemps = prevPrefs.filter(pref => ((request.maxTemp >= pref.maxTemp && request.minTemp <= pref.maxTemp)||(request.minTemp <= pref.minTemp && request.maxTemp >= pref.minTemp)))
+    
+    if (existingTemps.length) return res.status(400).json("One or more records exist for this temperature interval")
 
     const updatedPref = await Pref.findOneAndUpdate<PrefType>({_id: req.params.id}, request, { new: true })
     
-    if (!updatedPref) return res.sendStatus(404)
+    if (!updatedPref) return res.status(404).json("")
     res.send(updatedPref)
 })
 

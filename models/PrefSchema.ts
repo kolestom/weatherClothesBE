@@ -1,9 +1,7 @@
 import mongoose from "mongoose";
 import { Schema , InferSchemaType} from "mongoose";
-import { Types } from "mongoose";
 
-const Schema2 = mongoose.Schema
-const ObjectId = Schema2.Types.ObjectId 
+
 const prefSchema = new Schema({
     
     prefName: {type: String, required: true},
