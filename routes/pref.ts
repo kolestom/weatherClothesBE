@@ -5,7 +5,8 @@ import { z } from "zod";
 import { env } from "../util/envParser";
 import { Pref, PrefType } from "../models/PrefSchema";
 import { User, UserType } from "../models/UserSchema";
-import mongoose from "mongoose";
+import newPrefValidator from "../util/newPrefValidator";
+import updatePrefValidator from "../util/updatePrefValidator";
 
 
 const router = express.Router();
@@ -34,6 +35,7 @@ const PrefRequestSchema = z.object({
     }),
     notes: z.string().optional()
 })
+type PrefRequestSchemaType = z.infer<typeof PrefRequestSchema>;
 
 router.get('/', async (req: Request, res: Response) =>{
     // const user = await User.findOne({sub: res.locals.sub})
@@ -41,6 +43,15 @@ router.get('/', async (req: Request, res: Response) =>{
     const [user] = await User.find<UserType>()
     const allPrefs = await Pref.find<PrefType>({userSub: user.sub});
     res.send(allPrefs)
+})
+
+router.get('/:id', async (req: Request, res: Response) =>{
+    // const user = await User.findOne({sub: res.locals.sub})
+    // if (!user) return res.sendStatus(401)
+    const requestID:string = req.params.id
+    if (!requestID) return res.sendStatus(400)
+    const pref = await Pref.findOne<PrefType>({_id: requestID});
+    res.send(pref)
 })
 
 
@@ -51,43 +62,28 @@ router.post('/', verifyReqSchema(PrefRequestSchema), async (req: Request, res: R
     // if (!user) return res.sendStatus(401)
     
     const [user] = await User.find<UserType>()
+    const validPref = await newPrefValidator(request, user)
     
-    const prevPrefs = await Pref.find<PrefType>({
-        $and: [
-            {userSub: user.sub},
-            {$or: [
-                {$and:[
-                    {maxTemp: {$lte: request.maxTemp}},
-                    {maxTemp: {$gte: request.minTemp}}]},
-                {$and:[
-                    {minTemp: {$gte: request.minTemp}},
-                    {minTemp: {$lte: request.maxTemp}}]},
-            ]}]
-        });
-    
-    if (prevPrefs.length) return res.status(400).json("One or more records exist for this temperature interval")
+    if (!validPref) return res.status(400).json("One or more records exist for this temperature interval")
     
     await Pref.create<PrefType>(request);
-    const allPrefs = await Pref.find<PrefType>({userSub: user.sub})
-    res.send(allPrefs)
+    const userPrefs = await Pref.find<PrefType>({userSub: user.sub})
+    res.send(userPrefs)
 })
 
 router.put('/:id', verifyReqSchema(PrefRequestSchema), async (req: Request, res: Response) =>{
     const request:PrefType = req.body
+    const requestID:string = req.params.id
 
     // const user = await User.findOne({sub: res.locals.sub})
     // if (!user) return res.sendStatus(401)
-
-    // const prevPrefs = await Pref.find({userSub: user.sub})
+    
     const [user] = await User.find<UserType>()
-    const prevPrefs = await Pref.find<PrefType>({userSub: user.sub});
-
+    const validPref = await updatePrefValidator(request, user, requestID)
     
-    const existingTemps = prevPrefs.filter(pref => ((request.maxTemp >= pref.maxTemp && request.minTemp <= pref.maxTemp)||(request.minTemp <= pref.minTemp && request.maxTemp >= pref.minTemp)))
+    if (!validPref) return res.status(400).json("One or more records exist for this temperature interval")
     
-    if (existingTemps.length) return res.status(400).json("One or more records exist for this temperature interval")
-
-    const updatedPref = await Pref.findOneAndUpdate<PrefType>({_id: req.params.id}, request, { new: true })
+    const updatedPref = await Pref.findOneAndUpdate<PrefType>({_id: requestID}, request, { new: true })
     
     if (!updatedPref) return res.status(404).json("")
     res.send(updatedPref)
