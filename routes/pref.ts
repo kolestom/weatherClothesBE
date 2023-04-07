@@ -48,9 +48,9 @@ router.get('/', async (req: Request, res: Response) =>{
 router.get('/:id', async (req: Request, res: Response) =>{
     // const user = await User.findOne({sub: res.locals.sub})
     // if (!user) return res.sendStatus(401)
-    const requestID:string = req.params.id
-    if (!requestID) return res.sendStatus(400)
-    const pref = await Pref.findOne<PrefType>({_id: requestID});
+    const prefID:string = req.params.id
+    if (!prefID) return res.sendStatus(400)
+    const pref = await Pref.findOne<PrefType>({_id: prefID});
     res.send(pref)
 })
 
@@ -73,17 +73,17 @@ router.post('/', verifyReqSchema(PrefRequestSchema), async (req: Request, res: R
 
 router.put('/:id', verifyReqSchema(PrefRequestSchema), async (req: Request, res: Response) =>{
     const request:PrefType = req.body
-    const requestID:string = req.params.id
+    const prefID:string = req.params.id
 
     // const user = await User.findOne({sub: res.locals.sub})
     // if (!user) return res.sendStatus(401)
     
     const [user] = await User.find<UserType>()
-    const validPref = await updatePrefValidator(request, user, requestID)
+    const validPref = await updatePrefValidator(request, user, prefID)
     
     if (!validPref) return res.status(400).json("One or more records exist for this temperature interval")
     
-    const updatedPref = await Pref.findOneAndUpdate<PrefType>({_id: requestID}, request, { new: true })
+    const updatedPref = await Pref.findOneAndUpdate<PrefType>({_id: prefID}, request, { new: true })
     
     if (!updatedPref) return res.status(404).json("")
     res.send(updatedPref)
