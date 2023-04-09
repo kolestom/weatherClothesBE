@@ -28,23 +28,21 @@ router.post("/", verifyReqSchema(LoginRequestSchema), async (req: Request, res: 
   const loginRequest:LoginRequest = req.body
   const idToken = await getIdToken(loginRequest.code);
   if (!idToken) return res.status(401);
-  const payload: unknown = jwt.decode(idToken); // unknown kiveheto????
+  const payload = jwt.decode(idToken);
   const result = safeParseFc(Payload, payload);
   
-  if (!result) {
-    return res.sendStatus(500);
-  }
+  if (!result) return res.sendStatus(500)
   
   const user = await User.findOne<UserType>({sub: result.sub})
 
-  
   if (!user) {
-    const newUser = await User.create(result)
-    const sessionToken = jwt.sign({newUser}, env.JWT_SECRET_KEY, {expiresIn: "5m"});
+    const newUser:UserType = await User.create(result)
+    const sessionToken = jwt.sign({sub: newUser.sub}, env.JWT_SECRET_KEY, {expiresIn: "5m"});
     return res.send({sessionToken, username: newUser.name});
   }
-  // kell update, ha vmilye valtozna a user-nek
-  const sessionToken = jwt.sign({user}, env.JWT_SECRET_KEY, {expiresIn: "5m"});
+  const updateUser = await User.findOneAndUpdate<UserType>({sub: result.sub},{result}, {new: true})
+  
+  const sessionToken = jwt.sign({sub: updateUser?.sub}, env.JWT_SECRET_KEY, {expiresIn: "5m"});
   res.send({sessionToken, username: user.name});
 });
 export default router;

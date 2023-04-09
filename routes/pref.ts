@@ -2,11 +2,11 @@ import express, { Express, Request, Response } from "express";
 import { verifyReqSchema } from "../middleWares/verifyReqSchema";
 import { safeParseFc } from "../util/safeParseFc";
 import { z } from "zod";
-import { env } from "../util/envParser";
 import { Pref, PrefType } from "../models/PrefSchema";
 import { User, UserType } from "../models/UserSchema";
 import newPrefValidator from "../util/newPrefValidator";
 import updatePrefValidator from "../util/updatePrefValidator";
+import authMW from "../middleWares/authMW";
 
 
 const router = express.Router();
@@ -37,10 +37,9 @@ const PrefRequestSchema = z.object({
 })
 type PrefRequestSchemaType = z.infer<typeof PrefRequestSchema>;
 
-router.get('/', async (req: Request, res: Response) =>{
-    // const user = await User.findOne({sub: res.locals.sub})
-    // if (!user) return res.sendStatus(401)
-    const [user] = await User.find<UserType>()
+router.get('/', authMW, async (req: Request, res: Response) =>{
+    const user = await User.findOne<UserType>({sub: res.locals.sub})
+    if (!user) return res.sendStatus(401)
     const allPrefs = await Pref.find<PrefType>({userSub: user.sub});
     res.send(allPrefs)
 })
@@ -55,13 +54,12 @@ router.get('/:id', async (req: Request, res: Response) =>{
 })
 
 
-router.post('/', verifyReqSchema(PrefRequestSchema), async (req: Request, res: Response) =>{
+router.post('/', verifyReqSchema(PrefRequestSchema), authMW, async (req: Request, res: Response) =>{
     const request: PrefType = req.body
 
-    // const user = await User.findOne({sub: res.locals.sub})
-    // if (!user) return res.sendStatus(401)
+    const user = await User.findOne<UserType>({sub: res.locals.sub})
     
-    const [user] = await User.find<UserType>()
+    if (!user) return res.sendStatus(401)
     const validPref = await newPrefValidator(request, user)
     
     if (!validPref) return res.status(400).json("One or more records exist for this temperature interval")
@@ -71,14 +69,14 @@ router.post('/', verifyReqSchema(PrefRequestSchema), async (req: Request, res: R
     res.send(userPrefs)
 })
 
-router.put('/:id', verifyReqSchema(PrefRequestSchema), async (req: Request, res: Response) =>{
+router.put('/:id', verifyReqSchema(PrefRequestSchema), authMW, async (req: Request, res: Response) =>{
     const request:PrefType = req.body
     const prefID:string = req.params.id
 
-    // const user = await User.findOne({sub: res.locals.sub})
-    // if (!user) return res.sendStatus(401)
+    const user = await User.findOne<UserType>({sub: res.locals.sub})
     
-    const [user] = await User.find<UserType>()
+    
+    if (!user) return res.sendStatus(401)
     const validPref = await updatePrefValidator(request, user, prefID)
     
     if (!validPref) return res.status(400).json("One or more records exist for this temperature interval")
@@ -86,10 +84,11 @@ router.put('/:id', verifyReqSchema(PrefRequestSchema), async (req: Request, res:
     const updatedPref = await Pref.findOneAndUpdate<PrefType>({_id: prefID}, request, { new: true })
     
     if (!updatedPref) return res.status(404).json("")
-    res.send(updatedPref)
+    const userPrefs = await Pref.find<PrefType>({userSub: user.sub})
+    res.send(userPrefs)
 })
 
-router.delete('/:id', async(req: Request, res: Response) =>{
+router.delete('/:id', authMW, async(req: Request, res: Response) =>{
     const request:string = req.params.id
     const result = await Pref.deleteOne({_id: request})
     result.acknowledged ? res.json(result.acknowledged) : res.sendStatus(503) 
