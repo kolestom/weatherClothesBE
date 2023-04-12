@@ -1,6 +1,5 @@
 import express, { Express, Request, Response } from "express";
 import { verifyReqSchema } from "../middleWares/verifyReqSchema";
-import { safeParseFc } from "../util/safeParseFc";
 import { z } from "zod";
 import { Pref, PrefType } from "../models/PrefSchema";
 import { User, UserType } from "../models/UserSchema";
@@ -44,13 +43,20 @@ router.get('/', authMW, async (req: Request, res: Response) =>{
     res.send(allPrefs)
 })
 
-router.get('/:id', async (req: Request, res: Response) =>{
-    // const user = await User.findOne({sub: res.locals.sub})
-    // if (!user) return res.sendStatus(401)
-    const prefID:string = req.params.id
-    if (!prefID) return res.sendStatus(400)
-    const pref = await Pref.findOne<PrefType>({_id: prefID});
-    res.send(pref)
+router.get('/:temp', authMW, async (req: Request, res: Response) =>{
+    
+    const temp = parseInt(req.params.temp) 
+    if (!temp) return res.sendStatus(400)
+
+    const [matchedPref] = await Pref.find<PrefType>({
+        $and: [
+            {userSub: res.locals.sub},
+            {maxTemp: {$gte: temp}},
+            {minTemp: {$lte: temp}}
+        ]
+    });
+    if (!matchedPref) return res.status(404).json("No preference for this temperature")
+    res.send(matchedPref)
 })
 
 
