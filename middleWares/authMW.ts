@@ -14,7 +14,7 @@ const authMW = (req: Request, res: Response, next: NextFunction) => {
     //   next()
     // })
     
-    const header = req.headers["authorization"]
+    const header = req.headers.authorization
     if (!header) return res.sendStatus(401)
     const token = header.split(" ")[1]
     if (!token) return res.status(401)

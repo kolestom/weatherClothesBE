@@ -37,9 +37,9 @@ const PrefRequestSchema = z.object({
 type PrefRequestSchemaType = z.infer<typeof PrefRequestSchema>;
 
 router.get('/', authMW, async (req: Request, res: Response) =>{
-    const user = await User.findOne<UserType>({sub: res.locals.sub})
-    if (!user) return res.sendStatus(401)
-    const allPrefs = await Pref.find<PrefType>({userSub: user.sub});
+    // const user = await User.findOne<UserType>({sub: res.locals.sub})
+    // if (!user) return res.status(404).json('User not found')
+    const allPrefs = await Pref.find<PrefType>({userSub: res.locals.sub});
     res.send(allPrefs)
 })
 
@@ -60,7 +60,7 @@ router.get('/:temp', authMW, async (req: Request, res: Response) =>{
 })
 
 
-router.post('/', verifyReqSchema(PrefRequestSchema), authMW, async (req: Request, res: Response) =>{
+router.post('/', authMW, verifyReqSchema(PrefRequestSchema), async (req: Request, res: Response) =>{
     const request: PrefType = req.body
 
     const user = await User.findOne<UserType>({sub: res.locals.sub})
@@ -75,7 +75,7 @@ router.post('/', verifyReqSchema(PrefRequestSchema), authMW, async (req: Request
     res.send(userPrefs)
 })
 
-router.put('/:id', verifyReqSchema(PrefRequestSchema), authMW, async (req: Request, res: Response) =>{
+router.put('/:id', authMW, verifyReqSchema(PrefRequestSchema), async (req: Request, res: Response) =>{
     const request:PrefType = req.body
     const prefID:string = req.params.id
 
@@ -83,13 +83,13 @@ router.put('/:id', verifyReqSchema(PrefRequestSchema), authMW, async (req: Reque
     
     
     if (!user) return res.sendStatus(401)
-    const validPref = await updatePrefValidator(request, user, prefID)
+    const validPref = await updatePrefValidator(req.body, user, prefID)
     
     if (!validPref) return res.status(400).json("One or more records exist for this temperature interval")
     
-    const updatedPref = await Pref.findOneAndUpdate<PrefType>({_id: prefID}, request, { new: true })
+    const updatedPref = await Pref.findOneAndUpdate<PrefType>({_id: req.params.id}, request, { new: true })
     
-    if (!updatedPref) return res.status(404).json("")
+    if (!updatedPref) return res.status(404).json("No pref found")
     const userPrefs = await Pref.find<PrefType>({userSub: user.sub})
     res.send(userPrefs)
 })
@@ -97,7 +97,7 @@ router.put('/:id', verifyReqSchema(PrefRequestSchema), authMW, async (req: Reque
 router.delete('/:id', authMW, async(req: Request, res: Response) =>{
     const request:string = req.params.id
     const result = await Pref.deleteOne({_id: request})
-    result.acknowledged ? res.json(result.acknowledged) : res.sendStatus(503) 
+    result.acknowledged ? res.json(result.acknowledged) : res.sendStatus(404) 
 })
 
 

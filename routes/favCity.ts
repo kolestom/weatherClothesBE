@@ -22,13 +22,13 @@ router.get('/', authMW,async (req: Request, res: Response) =>{
     res.send(favCities)
 })
 
-router.post('/', verifyReqSchema(CityReqSchema), authMW,async (req: Request, res: Response) =>{
+router.post('/', authMW, verifyReqSchema(CityReqSchema), async (req: Request, res: Response) =>{
     const request:CityReqSchemaType = req.body
     
     const user = await User.findOne<UserType>({sub: res.locals.sub})
     if (!user) return res.sendStatus(401)
     
-    const [city] = await City.find({cityName: request.city})
+    const [city] = await City.find({$and: [{lat: request.lat}, {lon: request.lon}]})
     if(!city) {
         const newCity = await City.create<CityType>({
             city: request.city,

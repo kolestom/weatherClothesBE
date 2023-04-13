@@ -14,6 +14,8 @@ const WeatherReqSchema = z.object({
 
 router.post("/", verifyReqSchema(WeatherReqSchema), async(req: Request, res: Response) =>{
     const apiResponse = await axios.get(`https://api.weatherapi.com/v1/forecast.json?key=${env.WEATHER_API_KEY}&q=${req.body.city}+${req.body.country}&days=5&lang=en`)
+
+    //itt is kene safeparse
     if (!apiResponse) return res.sendStatus(502)
     res.send(apiResponse.data)  
 })

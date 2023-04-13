@@ -28,7 +28,7 @@ router.post("/", verifyReqSchema(LoginRequestSchema), async (req: Request, res: 
   const loginRequest:LoginRequest = req.body
   const idToken = await getIdToken(loginRequest.code);
   if (!idToken) return res.status(401);
-  const payload = jwt.decode(idToken);
+  const payload: unknown = jwt.decode(idToken);
   const result = safeParseFc(Payload, payload);
   
   if (!result) return res.sendStatus(500)
@@ -38,11 +38,11 @@ router.post("/", verifyReqSchema(LoginRequestSchema), async (req: Request, res: 
   if (!user) {
     const newUser = await User.create(result)
     const sessionToken = jwt.sign({newUser}, env.JWT_SECRET_KEY, {expiresIn: "5m"});
-    return res.send({sessionToken, username: newUser.name});
+    return res.send({token: sessionToken});
   }
   const updateUser = await User.findOneAndUpdate<UserType>({sub: result.sub},{result}, {new: true})
   
   const sessionToken = jwt.sign({updateUser}, env.JWT_SECRET_KEY, {expiresIn: "5m"});
-  res.send({sessionToken, username: user.name});
+  res.send({token: sessionToken});
 });
 export default router;

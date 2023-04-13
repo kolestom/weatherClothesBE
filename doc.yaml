@@ -1,0 +1,519 @@
+openapi: 3.0.3
+info:
+  version: "1.0"
+  title: WeatherClothesApp - 1.0
+  description: This is the server of the WeatherClothesApp
+servers:
+  - url: http://localhost:3005/api
+
+tags:
+  - name: pref
+    description: Everything about the weather preferences for a logged in user
+  - name: favCity
+    description: Add or remove a favorite city
+  - name: login
+    description: Single sign on with Google 
+  - name: weather
+    description: Get weather data and 5 day forecast for a city/town
+    externalDocs:
+      description: Find out more
+      url: https://www.weatherapi.com/docs/
+
+paths:
+  /pref:
+    get:
+      tags: 
+        - pref
+      summary: Finds all preferences for a logged in user
+      description: Finds all preference for a logged in user
+      operationId: getAllPrefs
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful operation. An array of objects is returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrefResponse'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrefResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden 
+    post:
+      tags: 
+        - pref
+      summary: Creates a preferences for a user
+      description: Creates a preferences for a logged in user
+      operationId: postOnePref
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Creates a preferences for a logged in user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrefResponse'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/PrefResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PrefResponse'
+        required: true
+      responses:
+        '200':
+          description: Successful operation. An array of objects is returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrefResponse'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrefResponse'
+        '400':
+          description: One or more records exist for this temperature interval
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: No pref found
+  /pref/{temp}:
+    get:
+      tags: 
+        - pref
+      summary: Find a preference for a given temperature
+      description: Returns a preference if one exists for the given temperature
+      operationId: getOnePref
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: temp
+          in: path
+          description: temperature for the pref to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation. An object is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrefResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/PrefResponse'
+        '400':
+          description: Bad request (authorization header missing)
+        '401':
+          description: Unauthorized (authorization token missing)
+        '403':
+          description: Forbidden
+        '404':
+          description: No preference for this temperature
+  /pref/{id}:
+    put:
+      tags: 
+        - pref
+      summary: Update a user preference based on its id
+      description: Updates a preference based on its id for a logged in user and returns all of the users preferences
+      operationId: updateOnePref
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id of the pref to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Updates a preferences for a logged in user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrefRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/PrefRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PrefRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation. An array of objects is returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrefResponse'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PrefResponse'
+        '400':
+          description: One or more records exist for this temperature interval
+        '401':
+          description: Unauthorized (authorization token missing)
+        '403':
+          description: Forbidden
+        '404':
+          description: No pref found
+    delete:
+      tags:
+        - pref
+      summary: Delete a user preference based on its id
+      description: Deletes a preference based on its id for a logged in user
+      operationId: deleteOnePref
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id of the pref to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+        '401':
+          description: Unauthorized (authorization token missing)
+        '403':
+          description: Forbidden
+        '404':
+          description: No pref found
+  /favCity:
+    get:
+      tags:
+        - favCity
+      summary: Finds all favorite cities for a logged in user
+      description: Finds all favorite cities for a logged in user. If the user has no favorites, an empty array is returned.
+      operationId: getAllFavCities
+      security:
+        - bearerAuth: []
+      responses:
+          '200':
+            description: Successful operation. An array of objects is returned.
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CityResponse'
+              application/xml:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CityResponse'
+          '401':
+            description: Unauthorized
+          '403':
+            description: Forbidden
+    post:
+      tags:
+        - favCity
+      summary: Adds a favorite city for a logged in user
+      description: Adds a favorite city for a logged in user. If the city already exist in the DB, it will be extended for the given user.
+      operationId: postFavCity
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Adds a favorite city for a logged in user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CityRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/CityRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CityRequest'
+        required: true
+      responses:
+          '200':
+            description: Successful operation. An array of objects is returned.
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CityResponse'
+              application/xml:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CityResponse'
+          '401':
+            description: Unauthorized
+          '403':
+            description: Forbidden
+  /favCity/{id}:
+    delete:
+      tags:
+        - favCity
+      summary: Removes a favorite city from the logged in user
+      description: Removes a favorite city from the logged in user
+      operationId: deleteOneFavCity
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id of the favorite city to be removed
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation. An array of objects is returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CityResponse'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CityResponse'
+        '401':
+          description: Unauthorized (authorization token missing)
+        '403':
+          description: Forbidden
+  /login:
+    post:
+      tags:
+        - login
+      summary: Logs in a user using Google single sign on.
+      description: Logs in a user using Google single sign on.
+      operationId: userLogin
+      requestBody:
+        description: Contains the code from Google's authorization server
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '400':
+          description: Bad request
+  /weather:
+    post:
+      tags:
+        - weather
+      summary: Gets weather data and 5 day forecast for a city/town
+      description: Receives city and country info and returns weather data from the WeatherAPI 
+      operationId: getWeather
+      requestBody:
+        description: Contains the city and country names
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                city:
+                  type: string
+                country:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  securitySchemes:
+    bearerAuth:            
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Jane Doe
+        sub:
+          type: number
+          example: 1234567890
+        email:
+          type: string
+          example: janedoe@mail.com
+
+    CityRequest:
+      type: object
+      properties:
+        city:
+          type: string
+          example: Kathmandu
+        country:
+          type: string
+          example: Nepal
+        lat:
+          type: number
+          example: 27.72
+        lon:
+          type: number
+          example: 85.32
+        
+    CityResponse:
+      type: object
+      properties:
+        city:
+          type: string
+          example: Kathmandu
+        country:
+          type: string
+          example: Nepal
+        lat:
+          type: number
+          example: 27.72
+        lon:
+          type: number
+          example: 85.32
+        userSubs:
+          type: array
+          items:
+            type: number
+            example: 1234567890
+
+    PrefRequest:
+      required:
+        - prefName
+        - userSub
+        - minTemp
+        - maxTemp
+      type: object
+      properties:
+        prefName:
+          type: string
+          example: summer days
+        minTemp:
+          type: number
+          example: 25
+        maxTemp:
+          type: number
+          example: 40
+        clothes:
+          type: object
+          properties:
+            cap:
+              type: boolean
+            scarf:
+              type: boolean
+            jacket:
+              type: boolean
+            thermoTop:
+              type: number
+              example: 2
+            gloves:
+              type: object
+              properties:
+                long:
+                  type: boolean
+                thermo:
+                  type: boolean
+            pants:
+              type: object
+              properties:
+                shorts:
+                  type: boolean
+                longs:
+                  type: boolean
+            thermoLeggins:
+              type: boolean
+            warmSocks:
+              type: number
+              example: 2
+        notes:
+          type: string
+          example: Sunscreen 50 and sunglasses needed!!
+    PrefResponse:
+      required:
+        - prefName
+        - userSub
+        - minTemp
+        - maxTemp
+      type: object
+      properties:
+        prefName:
+          type: string
+          example: summer days
+        userSub:
+          type: number
+          example: 1234567890
+        minTemp:
+          type: number
+          example: 25
+        maxTemp:
+          type: number
+          example: 40
+        clothes:
+          type: object
+          properties:
+            cap:
+              type: boolean
+            scarf:
+              type: boolean
+            jacket:
+              type: boolean
+            thermoTop:
+              type: number
+              example: 2
+            gloves:
+              type: object
+              properties:
+                long:
+                  type: boolean
+                thermo:
+                  type: boolean
+            pants:
+              type: object
+              properties:
+                shorts:
+                  type: boolean
+                longs:
+                  type: boolean
+            thermoLeggins:
+              type: boolean
+            warmSocks:
+              type: number
+              example: 2
+        notes:
+          type: string
+          example: Sunscreen 50 and sunglasses needed!!

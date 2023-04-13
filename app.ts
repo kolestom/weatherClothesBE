@@ -12,7 +12,7 @@ app.use(cors())
 app.use(express.json());
 app.use('/api/login', login)
 app.use('/api/pref', pref)
-app.use('/api/fav_city', favCity)
+app.use('/api/favCity', favCity)
 app.use('/api/weather', weather)
 
 
