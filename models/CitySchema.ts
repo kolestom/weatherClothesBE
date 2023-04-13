@@ -5,8 +5,7 @@ const citySchema = new mongoose.Schema({
     city: {type: String, required: true},
     country: {type: String, required: true},
     lat: Number,
-    lon: Number,
-    userSubs: [Number]
+    lon: Number
 })
 
 export type CityType = InferSchemaType<typeof citySchema>

@@ -1,11 +1,14 @@
 import mongoose from "mongoose";
 import { Schema , InferSchemaType} from "mongoose";
-import { Types } from "mongoose";
+
 
 const userSchema = new Schema({
     name: String,
     sub: Number,
     email: {type: String, required: true},
+    cities: [{
+        type: mongoose.Schema.Types.ObjectId
+    }]
 
 })
 export type UserType = InferSchemaType<typeof userSchema>
