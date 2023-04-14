@@ -37,12 +37,13 @@ router.post("/", verifyReqSchema(LoginRequestSchema), async (req: Request, res: 
 
   if (!user) {
     const newUser = await User.create(result)
-    const sessionToken = jwt.sign({newUser}, env.JWT_SECRET_KEY, {expiresIn: "5m"});
+    const sessionToken = jwt.sign({name: newUser.name, sub: newUser.sub}, env.JWT_SECRET_KEY, {expiresIn: "5m"});
     return res.send({token: sessionToken});
   }
   const updateUser = await User.findOneAndUpdate<UserType>({sub: result.sub},{result}, {new: true})
+  if (!updateUser) return res.sendStatus(401)
   
-  const sessionToken = jwt.sign({updateUser}, env.JWT_SECRET_KEY, {expiresIn: "5m"});
+  const sessionToken = jwt.sign({name: updateUser.name, sub: updateUser.sub}, env.JWT_SECRET_KEY, {expiresIn: "5m"});
   res.send({token: sessionToken});
 });
 export default router;

@@ -59,11 +59,11 @@ router.delete('/:id', authMW, async (req: Request, res: Response) =>{
     if (!city) return res.status(400).json("City not found")
     
     const updatedUser = await User.findOneAndUpdate({sub: res.locals.sub}, {$pull: {cities: city._id}}, {new: true})
-    const cityUsers = await User.find({cities: {$elemMatch: {_id: city._id}}})
+    const cityUsers = await User.find({cities: {$in: city._id}})
+    
     if (!cityUsers.length) {
         await city.deleteOne()
     }
-    
     const favCities = await City.find({_id: {$in: updatedUser?.cities}})
     res.send(favCities)
 

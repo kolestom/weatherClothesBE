@@ -3,8 +3,8 @@ import { Schema , InferSchemaType} from "mongoose";
 
 
 const userSchema = new Schema({
-    name: String,
-    sub: Number,
+    name: {type: String, required: true},
+    sub: {type: Number, required: true},
     email: {type: String, required: true},
     cities: [{
         type: mongoose.Schema.Types.ObjectId
