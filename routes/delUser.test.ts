@@ -3,16 +3,17 @@ import { cleanData, disconnect, connect } from "../mongodbMemoryServer/mongodb.m
 import app from "../app";
 import { env } from "../util/envParser";
 import { User } from "../models/UserSchema";
+import { City, CityType } from "../models/CitySchema";
 import { Pref } from "../models/PrefSchema";
 
-describe('POST /pref ', () =>{
+describe('DELETE /delUser ', () =>{
     beforeAll(connect);
     beforeEach(cleanData);
     afterAll(disconnect);
-    it("should return status 200, the response body should be an object. This object's notes property should match the testData ", async() =>{
+    it("should return status 200, and all collections should be empty ", async() =>{
         
         // given
-        const testData = {
+        const testPref = {
             prefName: "fagypont es afolott vmivel",
             userSub: parseInt(env.TEST_SUB),
             minTemp: 0,
@@ -35,19 +36,31 @@ describe('POST /pref ', () =>{
             sub: env.TEST_SUB,
             email: "karabely@levelek.hu",
         }
+        const testCity: CityType ={
+            city: 'Kathmandu',
+            country: 'NP',
+            lat: 11,
+            lon: 11
+        }
         
         // when
         await User.create(testUser)
-        const resp = await request(app)
+        await request(app)
+            .post('/api/favCity')
+            .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
+            .send(testCity)
+        await request(app)
             .post('/api/pref')
             .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
-            .send(testData)
+            .send(testPref)
+        const resp = await request(app)
+            .delete('/api/delUser')
+            .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
 
         // then
         expect(resp.status).toBe(200)
-        expect(typeof resp.body).toBe('object')
-        expect(resp.body.length).toBe(1)
-        expect(resp.body[0].notes).toBe(testData.notes)
-        expect((await Pref.find({userSub: testUser.sub})).length).toBe(1)
+        expect((await Pref.find({userSub: testUser.sub})).length).toBe(0)
+        expect((await City.find({city: testCity.city})).length).toBe(0)
+        expect((await User.find({sub: env.TEST_SUB})).length).toBe(0)
     })
 })
