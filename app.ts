@@ -1,4 +1,6 @@
-import express, { Express, Request, Response } from "express";
+import dotenv from "dotenv"
+dotenv.config()
+import express, { Express } from "express";
 import login from "./routes/login"
 import pref from './routes/pref'
 import favCity from './routes/favCity'
