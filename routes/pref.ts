@@ -3,8 +3,8 @@ import { verifyReqSchema } from "../middleWares/verifyReqSchema";
 import { z } from "zod";
 import { Pref, PrefType } from "../models/PrefSchema";
 import { User, UserType } from "../models/UserSchema";
-import newPrefValidator from "../util/newPrefValidator";
-import updatePrefValidator from "../util/updatePrefValidator";
+import prefValidatorNew from "../util/prefValidatorNew";
+import prefValidatorUpdate from "../util/prefValidatorUpdate";
 import authMW from "../middleWares/authMW";
 
 
@@ -66,7 +66,7 @@ router.post('/', authMW, verifyReqSchema(PrefRequestSchema), async (req: Request
     const user = await User.findOne<UserType>({sub: res.locals.sub})
     
     if (!user) return res.sendStatus(401)
-    const validPref = await newPrefValidator(request, user)
+    const validPref = await prefValidatorNew(request, user)
     
     if (!validPref) return res.status(400).json("One or more records exist for this temperature interval")
     
@@ -83,7 +83,7 @@ router.put('/:id', authMW, verifyReqSchema(PrefRequestSchema), async (req: Reque
     
     
     if (!user) return res.sendStatus(401)
-    const validPref = await updatePrefValidator(req.body, user, prefID)
+    const validPref = await prefValidatorUpdate(request, user, prefID)
     
     if (!validPref) return res.status(400).json("One or more records exist for this temperature interval")
     

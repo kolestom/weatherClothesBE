@@ -11,8 +11,8 @@ tags:
     description: Everything about the weather preferences for a logged in user
   - name: favCity
     description: Add or remove a favorite city
-  - name: login
-    description: Single sign on with Google 
+  - name: userMGMT
+    description: Single sign on with Google and deletion of a profile
   - name: weather
     description: Get weather data and 5 day forecast for a city/town
     externalDocs:
@@ -303,7 +303,7 @@ paths:
   /login:
     post:
       tags:
-        - login
+        - userMGMT
       summary: Logs in a user using Google single sign on.
       description: Logs in a user using Google single sign on.
       operationId: userLogin
@@ -355,6 +355,22 @@ paths:
             application/json:
               schema:
                 type: object
+  /delUser:
+    delete:
+      tags:
+        - userMGMT
+      summary: Delete a user with all related data
+      description: A logged in user will be deleted with all related data (preferences and favorite cities)
+      operationId: delUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful operation.
+        '401':
+          description: Unauthorized (authorization token missing)
+        '403':
+          description: Forbidden
 components:
   securitySchemes:
     bearerAuth:            
