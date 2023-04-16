@@ -12,7 +12,7 @@ const router = express.Router();
 
 
 const PrefRequestSchema = z.object({
-    userSub: z.number(),
+    userSub: z.string(),
     prefName: z.string(),
     minTemp: z.number(),
     maxTemp: z.number(),

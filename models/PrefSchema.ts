@@ -5,7 +5,7 @@ import { Schema , InferSchemaType} from "mongoose";
 const prefSchema = new Schema({
     
     prefName: {type: String, required: true},
-    userSub: {type: Number, required: true},
+    userSub: {type: String, required: true},
     minTemp: {type: Number, required: true},
     maxTemp: {type: Number, required: true},
     clothes: {

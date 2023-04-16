@@ -14,7 +14,7 @@ describe('POST /pref ', () =>{
         // given
         const testData = {
             prefName: "fagypont es afolott vmivel",
-            userSub: parseInt(env.TEST_SUB),
+            userSub: env.TEST_SUB,
             minTemp: 0,
             maxTemp: 7,
             clothes: {

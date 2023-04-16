@@ -10,12 +10,12 @@ describe('DELETE /delUser ', () =>{
     beforeAll(connect);
     beforeEach(cleanData);
     afterAll(disconnect);
-    it("should return status 200, and all collections should be empty ", async() =>{
+    it("should return status 200, and all collections should be cleaned from user related data ", async() =>{
         
         // given
         const testPref = {
             prefName: "fagypont es afolott vmivel",
-            userSub: parseInt(env.TEST_SUB),
+            userSub: env.TEST_SUB,
             minTemp: 0,
             maxTemp: 7,
             clothes: {
@@ -59,8 +59,69 @@ describe('DELETE /delUser ', () =>{
 
         // then
         expect(resp.status).toBe(200)
-        expect((await Pref.find({userSub: testUser.sub})).length).toBe(0)
-        expect((await City.find({city: testCity.city})).length).toBe(0)
+        expect(await Pref.find({})).toHaveLength(0)
+        expect((await City.find({})).length).toBe(0)
+        expect((await User.find({sub: env.TEST_SUB})).length).toBe(0)
+    })
+    it("should return status 200, and all collections should be cleaned from user related data (no cities) ", async() =>{
+        
+        // given
+        const testPref = {
+            prefName: "fagypont es afolott vmivel",
+            userSub: env.TEST_SUB,
+            minTemp: 0,
+            maxTemp: 7,
+            clothes: {
+                cap: true,
+                scarf: false,
+                jacket: true,
+                thermoTop: 44,
+                gloves: {
+                long: false,
+                },
+                thermoLeggins: true,
+                warmSocks: 2,
+            },
+            notes: "kell a teljes anzug",
+        };
+        const testUser = {
+            name: 'Winch Eszter',
+            sub: env.TEST_SUB,
+            email: "karabely@levelek.hu",
+        }
+        
+        // when
+        await User.create(testUser)
+        await request(app)
+            .post('/api/pref')
+            .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
+            .send(testPref)
+        const resp = await request(app)
+            .delete('/api/delUser')
+            .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
+
+        // then
+        expect(resp.status).toBe(200)
+        expect(await Pref.find({})).toHaveLength(0)
+        expect((await User.find({sub: env.TEST_SUB})).length).toBe(0)
+    })
+    it("should return status 200, and the user should be deleted (no prefs, no cities) ", async() =>{
+        
+        // given
+        const testUser = {
+            name: 'Winch Eszter',
+            sub: env.TEST_SUB,
+            email: "karabely@levelek.hu",
+        }
+        
+        // when
+        await User.create(testUser)
+        const resp = await request(app)
+            .delete('/api/delUser')
+            .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
+
+        // then
+        expect(resp.status).toBe(200)
         expect((await User.find({sub: env.TEST_SUB})).length).toBe(0)
     })
 })

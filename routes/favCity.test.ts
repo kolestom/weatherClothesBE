@@ -40,6 +40,7 @@ describe('POST /favCity', () =>{
         const resp = await request(app)
             .post('/api/favCity')
             .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
+            .query({name: "Jozsi"})
             .send(testData2)
         
         
@@ -84,8 +85,6 @@ describe('POST /favCity', () =>{
             .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
             .send(testData2)
         
-        
-
         // then
         expect(resp.status).toBe(406)
     })

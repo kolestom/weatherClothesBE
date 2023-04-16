@@ -5,7 +5,8 @@ import { z } from "zod";
 
 const TokenSchema = z.object({
   name: z.string(),
-  sub: z.number()
+  sub: z.string(),
+  email: z.string()
 });
 
 const authMW = (req: Request, res: Response, next: NextFunction) => {

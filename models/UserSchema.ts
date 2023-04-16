@@ -4,7 +4,7 @@ import { Schema , InferSchemaType} from "mongoose";
 
 const userSchema = new Schema({
     name: {type: String, required: true},
-    sub: {type: Number, required: true},
+    sub: {type: String, required: true},
     email: {type: String, required: true},
     cities: [{
         type: mongoose.Schema.Types.ObjectId
