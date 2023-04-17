@@ -7,11 +7,11 @@ import { env } from "../util/envParser"
 jest.mock("../api/google")
 import { getIdToken } from "../api/google"
 
-describe('DELETE /delUser ', () =>{
+describe('POST /login ', () =>{
     beforeAll(connect)
     afterEach(cleanData)
     afterAll(disconnect)
-    it("should return 200 and save user to database", async () => {
+    it("should return 200 and save user to the DB", async () => {
         // given
         const code = "as56df5w5a8d823djak"
         const token = env.TEST_TOKEN
