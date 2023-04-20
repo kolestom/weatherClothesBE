@@ -60,7 +60,7 @@ describe('DELETE /delUser ', () =>{
         // then
         expect(resp.status).toBe(200)
         expect(await Pref.find({})).toHaveLength(0)
-        expect((await City.find({})).length).toBe(0)
+        expect(await City.find({})).toHaveLength(0)
         expect((await User.find({sub: env.TEST_SUB})).length).toBe(0)
     })
     it("should return status 200, and all user related data should be removed from the DB (no cities) ", async() =>{

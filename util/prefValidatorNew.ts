@@ -3,7 +3,7 @@ import { UserType } from "../models/UserSchema";
 
 const prefValidatorNew = async(request: PrefType, user:UserType): Promise<boolean> => {
     
-    const prevPrefs = await Pref.find<PrefType>({
+    const prevPrefs = await Pref.find({
         $and: [
             {userSub: user.sub},
             {$or: [

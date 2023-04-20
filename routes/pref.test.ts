@@ -48,7 +48,7 @@ describe('POST /pref ', () =>{
         expect(typeof resp.body).toBe('object')
         expect(resp.body.length).toBe(1)
         expect(resp.body[0].notes).toBe(testData.notes)
-        expect((await Pref.find({userSub: testUser.sub})).length).toBe(1)
+        expect(await Pref.find({userSub: testUser.sub})).toHaveLength(1)
     })
     it("should return status 400, and an error message if the 2nd testData's Temp interval cover/overlap the 1st's", async() =>{
         
@@ -149,7 +149,7 @@ describe('GET /pref ', () =>{
         expect(resp.body[0].notes).toBe(testData.notes)
         expect(resp.body[0].prefName).toBe(testData.prefName)
         expect(resp.body[0].maxTemp).toBe(testData.maxTemp)
-        expect((await Pref.find({userSub: testUser.sub})).length).toBe(1)
+        expect(await Pref.find({userSub: testUser.sub})).toHaveLength(1)
     })
 })
 describe('GET /pref/:id ', () =>{

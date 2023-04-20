@@ -9,7 +9,7 @@ describe('GET /favCity', () =>{
     beforeAll(connect)
     afterEach(cleanData)
     afterAll(disconnect)
-    it("should return status 200 with an array of 2 objects that match the testData", async()=>{
+    it("should return status 200 with an array of 2 objects that match the testData. The DB should have 2 documents in the City collection", async()=>{
 
         // given
         const testData1: CityType ={
@@ -46,14 +46,14 @@ describe('GET /favCity', () =>{
         expect(resp.body.length).toBe(2)
         expect(resp.body[0].city).toBe(testData1.city)
         expect(resp.body[1].lat).toBe(testData2.lat)
-        expect((await City.find({})).length).toBe(2)
+        expect(await City.find({})).toHaveLength(2)
     })
 })
 describe('POST /favCity', () =>{
     beforeAll(connect)
     afterEach(cleanData)
     afterAll(disconnect)
-    it("should return status 200 with an array of 2 objects that match the testData", async()=>{
+    it("should return status 200 with an array of 2 objects that match the testData. The DB should have 2 documents in the City collection", async()=>{
 
         // given
         const testData1: CityType ={
@@ -90,7 +90,7 @@ describe('POST /favCity', () =>{
         expect(resp.body.length).toBe(2)
         expect(resp.body[0].city).toBe(testData1.city)
         expect(resp.body[1].lat).toBe(testData2.lat)
-        expect((await City.find({})).length).toBe(2)
+        expect(await City.find({})).toHaveLength(2)
     })
     it("should return status 406 if the 2nd testData matches the 1st", async()=>{
 
@@ -185,6 +185,6 @@ describe('DELETE /favCity/:id', () =>{
         
         // then
         expect(resp.status).toBe(200)
-        expect((await City.find({city: testData1.city})).length).toBe(0)
+        expect(await City.find({city: testData1.city})).toHaveLength(0)
     })
 })
