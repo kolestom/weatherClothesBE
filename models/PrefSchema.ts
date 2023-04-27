@@ -14,6 +14,7 @@ const prefSchema = new Schema({
         jacket: Boolean,
         thermoTop: Number,
         gloves: {
+            short: Boolean,
             long: Boolean,
             thermo: Boolean
         },

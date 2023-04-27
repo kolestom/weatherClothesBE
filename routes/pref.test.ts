@@ -137,10 +137,13 @@ describe('GET /pref ', () =>{
         
         // when
         await User.create(testUser)
-        const resp = await request(app)
+        await request(app)
             .post('/api/pref')
             .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
             .send(testData)
+        const resp = await request(app)
+            .get('/api/pref')
+            .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
 
         // then
         expect(resp.status).toBe(200)

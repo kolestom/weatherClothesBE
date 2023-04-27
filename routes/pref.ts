@@ -22,6 +22,7 @@ const PrefRequestSchema = z.object({
         jacket: z.boolean().optional(),
         thermoTop: z.number().optional(),
         gloves: z.object({
+            short: z.boolean().optional(),
             long: z.boolean().optional(),
             thermo: z.boolean().optional()
         }).optional(),
@@ -97,7 +98,7 @@ router.put('/:id', authMW, verifyReqSchema(PrefRequestSchema), async (req: Reque
 router.delete('/:id', authMW, async(req: Request, res: Response) =>{
     const request:string = req.params.id
     const result = await Pref.deleteOne({_id: request})
-    result.acknowledged ? res.json(result.acknowledged) : res.sendStatus(404) 
+    result.acknowledged ? res.json(await Pref.find<PrefType>({userSub: res.locals.sub})) : res.sendStatus(404) 
 })
 
 

@@ -36,10 +36,14 @@ describe('GET /favCity', () =>{
             .post('/api/favCity')
             .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
             .send(testData1)
-        const resp = await request(app)
+        await request(app)
             .post('/api/favCity')
             .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
             .send(testData2)
+
+        const resp = await request(app)
+            .get('/api/favCity')
+            .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
         
         // then
         expect(resp.status).toBe(200)
