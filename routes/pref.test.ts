@@ -134,13 +134,13 @@ describe('GET /pref ', () =>{
             sub: env.TEST_SUB,
             email: "karabely@levelek.hu",
         }
-        
-        // when
         await User.create(testUser)
         await request(app)
             .post('/api/pref')
             .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
             .send(testData)
+        
+        // when
         const resp = await request(app)
             .get('/api/pref')
             .set('Authorization', 'Bearer ' + env.TEST_TOKEN)
