@@ -9,7 +9,7 @@ To be able to run the server on your local machine, follow these steps.
 
 1. Clone the repository
 2. Install the dependencies:
-    npm install
+    $ npm install
 3. Create a .env file in the root directory of the project with the following variables:
     -   SERVER: the port number of the express server that the frontend will use (3005)
     -   MONGO_URL: a MongoDB URI for connecting to your database.
