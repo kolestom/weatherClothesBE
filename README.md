@@ -20,12 +20,18 @@ To be able to run the server on your local machine, follow these steps.
     -   CLIENT_SECRET: a secret key for the OAuth2 application from the Google Developer Console.
     -   REDIRECT_URI = http://localhost:5173/callback
     -   WEATHER_API_KEY = An API key for the 3rd party Weather API [Documentation](https://www.weatherapi.com/docs/)
-    -   TEST_TOKEN = create a test token for testing that is created with the JWT_SECRET_KEY
+    -   TEST_TOKEN = create a token for testing using the JWT_SECRET_KEY
     -   TEST_SUB = create a sub that will be included in the TEST_TOKEN
 4.  Run the build script:
+    ```bash
     npm run build
+    ```
 5.  Start the backend server:
+    ```
     npm start
+    ```
 6.  Start the frontend development server:
+    ```
     npm run dev
+    ```
     Access the frontend by navigating to http://localhost:5173/ in your browser
