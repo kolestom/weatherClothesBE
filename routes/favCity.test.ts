@@ -96,7 +96,7 @@ describe('POST /favCity', () =>{
         expect(resp.body[1].lat).toBe(testData2.lat)
         expect(await City.find({})).toHaveLength(2)
     })
-    it("should return status 406 if the 2nd testData matches the 1st", async()=>{
+    it("should return status 409 if the 2nd testData matches the 1st", async()=>{
 
         // given
         const testData1: CityType ={
@@ -130,7 +130,7 @@ describe('POST /favCity', () =>{
             .send(testData2)
         
         // then
-        expect(resp.status).toBe(406)
+        expect(resp.status).toBe(409)
     })
     it("should return status 401 if there's no authorization token in the header", async()=>{
 

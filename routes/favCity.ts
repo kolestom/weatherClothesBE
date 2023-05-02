@@ -45,7 +45,7 @@ router.post('/', authMW, verifyReqSchema(CityReqSchema), async (req: Request, re
         return res.send(favCities)
     }
 
-    if(user.cities.includes(city._id)) return res.status(406).json("city has already been set as a favorite")
+    if(user.cities.includes(city._id)) return res.status(409).json(`${request.city} in ${request.country} has already been set as a favorite`)
     user.cities.push(city._id)
     await user.save()
     const favCities = await City.find({_id: {$in: user.cities}})

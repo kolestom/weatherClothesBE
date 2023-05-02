@@ -135,6 +135,8 @@ describe('GET /pref ', () =>{
             email: "karabely@levelek.hu",
         }
         await User.create(testUser)
+        // kiszervezett mockolt fuggveny kene
+        
         await request(app)
             .post('/api/pref')
             .set('Authorization', 'Bearer ' + env.TEST_TOKEN)

@@ -13,6 +13,7 @@ describe("POST, /weather",  ()=>{
             city: 'Kathmandu',
             country: "Nepal"
         }
+        // mockolasa kell a weather API-nak is
     
         // when
         const weatherResponse = await request(app)

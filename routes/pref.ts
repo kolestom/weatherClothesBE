@@ -38,8 +38,6 @@ const PrefRequestSchema = z.object({
 type PrefRequestSchemaType = z.infer<typeof PrefRequestSchema>;
 
 router.get('/', authMW, async (req: Request, res: Response) =>{
-    // const user = await User.findOne<UserType>({sub: res.locals.sub})
-    // if (!user) return res.status(404).json('User not found')
     const allPrefs = await Pref.find<PrefType>({userSub: res.locals.sub});
     res.send(allPrefs)
 })
