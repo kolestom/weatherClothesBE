@@ -7,9 +7,13 @@ To be able to run the server on your local machine, follow these steps.
 
 ### Steps for running
 
-1. Clone the repository
+1. Clone the repository and change to the new directory:
+    ```
+    git clone https://github.com/kolestom/weatherClothesBE.git
+    cd weatherClothesBE
+    ```
 2. Install the dependencies:
-    ```bash
+    ```
     npm install
     ```
 3. Create a .env file in the root directory of the project with the following variables:
@@ -23,15 +27,11 @@ To be able to run the server on your local machine, follow these steps.
     -   TEST_TOKEN = create a token for testing using the JWT_SECRET_KEY
     -   TEST_SUB = create a sub that will be included in the TEST_TOKEN
 4.  Run the build script:
-    ```bash
+    ```
     npm run build
     ```
 5.  Start the backend server:
     ```
     npm start
     ```
-6.  Start the frontend development server:
-    ```
-    npm run dev
-    ```
-    Access the frontend by navigating to http://localhost:5173/ in your browser
+6.  To download and launch the frontend server, follow the README.md on [this](https://github.com/kolestom/weatherClothesFE) link
