@@ -5,16 +5,21 @@
 This repository contains the backend server for the WeatherClothes APP.
 To be able to run the server on your local machine, follow these steps.
 
+## Prerequisites
+
+Make sure you have Node.js installed on your machine. You can download it from the official website: https://nodejs.org/
+You will also need git installed on your machine. Check the [GitHub](https://github.com/git-guides/install-git) or the [git-scm](https://git-scm.com/downloads) websites for guidance.
+
 ### Steps for running
 
 1. Clone the repository and change to the new directory:
     ```
-    git clone https://github.com/kolestom/weatherClothesBE.git
-    cd weatherClothesBE
+    $ git clone https://github.com/kolestom/weatherClothesBE.git
+    $ cd weatherClothesBE
     ```
 2. Install the dependencies:
     ```
-    npm install
+    $ npm install
     ```
 3. Create a .env file in the root directory of the project with the following variables:
     -   SERVER: the port number of the express server that the frontend will use (3005)
@@ -28,10 +33,10 @@ To be able to run the server on your local machine, follow these steps.
     -   TEST_SUB = create a sub that will be included in the TEST_TOKEN
 4.  Run the build script:
     ```
-    npm run build
+    $ npm run build
     ```
 5.  Start the backend server:
     ```
-    npm start
+    $ npm start
     ```
 6.  To download and launch the frontend server, follow the README.md on [this](https://github.com/kolestom/weatherClothesFE) link
