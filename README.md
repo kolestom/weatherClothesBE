@@ -1,5 +1,12 @@
 # WeatherClothes APP backend
 
+## About the APP
+
+The basic idea behind this weather application is to be able to set clothes suggestions for temperature intervals. This feature is available after a Google OAuth login. Without login only the basic city search function is available.
+After login the user can set up custom temperature intervals and select clothes for that interval in the "Manage preferences" menu (the options are based on the clothes I use for cycling ;-))
+By clicking on the temerature value of a city the app will show the clothes suggestion for that temperature. (The 24h forecast cards can also be clicked)
+The user can also save a city as a favorite by clicking on the star on the city card.
+
 ## Description
 
 This repository contains the backend server for the WeatherClothes APP.
